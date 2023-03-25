@@ -10,4 +10,4 @@ ext_core = Extension(
         include_dirs=[np.get_include()],
         extra_compile_args=["-O3"])
  
-setup( ext_modules = cythonize([ext_core]) )
+setup(ext_modules = cythonize([ext_core]))

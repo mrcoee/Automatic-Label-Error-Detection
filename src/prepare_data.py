@@ -6,7 +6,7 @@ from tqdm.contrib.concurrent import process_map
 from scipy.special import softmax
 from pathlib import Path
 
-from inout import save_data
+from metric_computations import compute_metrics
 from config import cfg
 
 
@@ -22,13 +22,13 @@ def process_data(logits_fn):
     gt_masks = np.asarray(gt_masks)
 
     args = [softmax_vs, gt_masks, fn_prefix]
-
-    save_data(args)
+    compute_metrics(args)
     
 
 def load_data():
-    """Reads your data from your data root folder and prepare it for the metric computaiton"""
-    Path(cfg.DATA_DIR).mkdir(parents=True, exist_ok=True)
+    """Reads your data from your data root folder and calculate metrics"""
+    Path(cfg.COMPONENTS_DIR).mkdir(parents=True, exist_ok=True)
+    Path(cfg.METRICS_DIR).mkdir(parents=True, exist_ok=True)
 
     print(f"Process {cfg.DATASET} data:") 
     logit_fns = sorted(os.listdir(cfg.LOGITS_DIR))

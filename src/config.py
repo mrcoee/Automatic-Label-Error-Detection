@@ -4,7 +4,7 @@ from easydict import EasyDict as edict
 cfg = edict()
 
 cfg.DATASET = "Cityscapes"      # Availabale in labels.py are Carla, Cityscape, Coco, PascalVOC
-cfg.DATASET_DIR = "/home/marco/data/nvidia_val" #Root folder of your dataset
+cfg.DATASET_DIR = "/path/to/your/data" # Root folder of your dataset
 
 # Required input paths
 cfg.NET_INPUT_DIR = os.path.join(cfg.DATASET_DIR, "net_input") # Required for visualizations
@@ -13,20 +13,15 @@ cfg.GT_MASKS_DIR = os.path.join(cfg.DATASET_DIR, "gt_masks") # Ground truth segm
 cfg.LOGITS_DIR = os.path.join(cfg.DATASET_DIR, "logits") # Ground truth segmentation masks
 
 # Paths to store intermediate results. Only the root has to be set
-cfg.INTERMEDIATE_DIR = "/home/marco/labelerror_detection/meta_seg/intermediate_results"
-
-cfg.DATA_DIR = os.path.join(cfg.INTERMEDIATE_DIR, "data")
+cfg.INTERMEDIATE_DIR = "~/labelerror_detection/intermediate_results"
 cfg.COMPONENTS_DIR = os.path.join(cfg.INTERMEDIATE_DIR, "components")  
 cfg.METRICS_DIR = os.path.join(cfg.INTERMEDIATE_DIR, "metrics")  
 
 # Visualization paths
-cfg.VISUALIZATIONS_DIR = "/home/marco/labelerror_detection/meta_seg/visualizations"
+cfg.VISUALIZATIONS_DIR = "~/labelerror_detection/visualizations"
+cfg.ERROR_PROPOSAL_DIR = os.path.join(cfg.VISUALIZATIONS_DIR, "error_proposals") # Where the proposals are saved
 
-# cfg.LABEL_ERROR_DIR = os.path.join(cfg.VISUALIZATIONS_DIR, "label_error_vis")
-cfg.ERROR_PROPOSAL_DIR = os.path.join(cfg.VISUALIZATIONS_DIR, "error_proposals")
-cfg.META_SEG_VIS_DIR = os.path.join(cfg.VISUALIZATIONS_DIR, "meta_seg")
-
-cfg.NUM_WORKERS = 4 # Number of multiprocessing workers
+cfg.NUM_WORKERS = 1 # Number of multiprocessing workers
 cfg.random_seed = 1
 
 cfg.SPLIT_RATIO = 0.5 # Value between 0 and 1. Determine how much of the dataset is used to train meta Seg.

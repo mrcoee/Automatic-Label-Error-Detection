@@ -1,9 +1,7 @@
 import argparse
 from config import cfg
 from prepare_data import load_data
-from metric_computations import compute_metrics_mp
 from analyze_metrics import evaluate
-
 
 def main():
     parser = argparse.ArgumentParser()
@@ -14,8 +12,6 @@ def main():
     args = parser.parse_args()
     if args.load:
         load_data()
-    if args.metrics:
-        compute_metrics_mp()
     if args.evaluate:
         evaluate()
 
