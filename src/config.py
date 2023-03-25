@@ -22,8 +22,7 @@ cfg.VISUALIZATIONS_DIR = "~/labelerror_detection/visualizations"
 cfg.ERROR_PROPOSAL_DIR = os.path.join(cfg.VISUALIZATIONS_DIR, "error_proposals") # Where the proposals are saved
 
 cfg.NUM_WORKERS = 1 # Number of multiprocessing workers
-cfg.random_seed = 1
-
+cfg.random_seed = 1 # Control the Random split of the data
 cfg.SPLIT_RATIO = 0.5 # Value between 0 and 1. Determine how much of the dataset is used to train meta Seg.
 cfg.CLASS_IDS = [6, 7, 11, 12, 13, 14, 15, 17, 18] # Class ids of classes in which we search for label errors. E.g. Carla [2, 7, 9, 13] Cityscapes [6, 7, 11, 12, 13, 14, 15, 17, 18] #Pascal list(range(1, 21)) #Coco list(range(1, 93)) 
 cfg.MIN_ERROR_SIZE = 100 # Defines the minimum amount of pixel error proposal must have

@@ -12,9 +12,10 @@ def proposal_vis(iou, fn, seg_id, cls_id):
     """Visualization of one potential label error in image fn"""
     inf_ar = np.asarray(Image.open(os.path.join(cfg.INFERENCE_OUTPUT_DIR, fn + ".png")), dtype="uint8")
     
-    img_suffix = os.listdir(cfg.GT_MASKS_DIR)[0].split(".")[-1]
-    gt_mask = np.array(Image.open(os.path.join(cfg.GT_MASKS_DIR, fn + "." + img_suffix)))
-    net_input = np.array(Image.open(os.path.join(cfg.NET_INPUT_DIR, fn + "." + img_suffix)))
+    gt_mask_suffix = os.listdir(cfg.GT_MASKS_DIR)[0].split(".")[-1]
+    net_input_suffix = os.listdir(cfg.NET_INPUT_DIR)[0].split(".")[-1]
+    gt_mask = np.array(Image.open(os.path.join(cfg.GT_MASKS_DIR, fn + "." + gt_mask_suffix)))
+    net_input = np.array(Image.open(os.path.join(cfg.NET_INPUT_DIR, fn + "." + net_input_suffix)))
     
     Dataset = getattr(labels, cfg.DATASET.capitalize())
     trainId2color = Dataset.trainId2color
@@ -69,8 +70,8 @@ def proposal_vis(iou, fn, seg_id, cls_id):
     i = 0
     while not saved:
         try:
-            open(os.path.join(cfg.ERROR_PROPOSAL_DIR, fn + f"proposal_{i}." + img_suffix))
+            open(os.path.join(cfg.ERROR_PROPOSAL_DIR, fn + f"_proposal_{i}." + net_input_suffix))
             i += 1
         except IOError:
-            out_img.save(os.path.join(cfg.ERROR_PROPOSAL_DIR, fn + f"proposal_{i}." + img_suffix))
+            out_img.save(os.path.join(cfg.ERROR_PROPOSAL_DIR, fn + f"_proposal_{i}." + net_input_suffix))
             saved = True
