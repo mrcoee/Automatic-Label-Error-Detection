@@ -14,7 +14,7 @@ quantification to find label errors in semantic segmentation datasets.
 * Next, navigate into "~/labelerror_detection/src" and run
     
     ```
-    > pip install requirements.txt
+    > pip install -r requirements.txt
     ```
 * And lastly also run
     
