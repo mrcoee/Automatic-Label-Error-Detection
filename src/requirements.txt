@@ -1,7 +1,6 @@
 easydict
 numpy
 scipy
-h5py
 Pillow
 tqdm
 Cython
