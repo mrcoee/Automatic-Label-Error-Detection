@@ -50,7 +50,7 @@ This model does not automatically search for label errors in all classes of the 
 set the *CLASS_IDS* parameter in the *config.py* file
 
 **Important:** The segmentation mask and the ground truth mask must be given as single-channel grayscale images, with each 
-pixel contains a class id. The logit outputs must be saved as npy arrays in [Channel, X, Y] format.
+pixel containing a class id. The logit outputs must be saved as npy arrays in [Channel, X, Y] format.
 
 The path to each folder and the dataset to evaluate are set in the config. Currently implemented datasets are Cityscapes, Carla, PascalVOC
 and Cocostuff. If you wish to add additional datasets, you have to provide the class definition in the *label.py* file.
