@@ -9,7 +9,7 @@ from multiprocessing import Pool
 from scipy.interpolate import interp1d
 
 from regression import classification_fit_and_predict, classification_fit_and_predict
-from visualization import proposal_vis
+from visualization import proposal_vis, benchmark_vis, label_error_vis
 
 from config import cfg
 
@@ -70,8 +70,8 @@ def evaluate():
     """
 
     #use a random seed so that the results are reproducible
-    if "random_seed" in cfg:
-        np.random.seed(cfg.random_seed)
+    if "RANDOM_SEED" in cfg:
+        np.random.seed(cfg.RANDOM_SEED)
             
     metric_fns = sorted(os.listdir(cfg.METRICS_DIR))
     inputs_len = len(metric_fns)
@@ -115,7 +115,7 @@ def evaluate():
     # with the lowest confidence is the first element in the list.
     # k is defined in the config file by cfg.NUM_PRPOSALS
     k = 0
-    meta_seg_vis_args = []
+    benchmark_prediction_args = []
     segment_heap = []
     val_fns = [fn.split("_")[0] for fn in metric_fns[int(cfg.SPLIT_RATIO * inputs_len):]]
     print("Searching for label errors...")
@@ -134,19 +134,30 @@ def evaluate():
                     iou_ar[np.abs(segments) == seg_ind] = perturbed_y0a_val_pred[k+i, 0]*255
                     seg_size = len(np.where(np.abs(segments) == seg_ind)[0])
 
-                    if seg_size >= cfg.MIN_ERROR_SIZE and len(segment_heap) < cfg.NUM_PRPOSALS:
+                    if seg_size >= cfg.MIN_PROPOSAL_SIZE and len(segment_heap) < cfg.NUM_PRPOSALS:
                         heapq.heappush(segment_heap, (perturbed_y0a_val_pred[k+i, 0], fn, seg_ind, cls_id))
 
-                    elif seg_size >= cfg.MIN_ERROR_SIZE and segment_heap[0][0] < perturbed_y0a_val_pred[k+i, 0] and len(segment_heap) == cfg.NUM_PRPOSALS:
+                    elif seg_size >= cfg.MIN_PROPOSAL_SIZE and segment_heap[0][0] < perturbed_y0a_val_pred[k+i, 0] and len(segment_heap) == cfg.NUM_PRPOSALS:
                         heapq.heappop(segment_heap)
                         heapq.heappush(segment_heap, (perturbed_y0a_val_pred[k+i, 0], fn, seg_ind, cls_id))
-                        
-        meta_seg_vis_args.append((fn, perturbed_ya_val[k:k+len(pos_segments)], perturbed_y0a_val_pred[k:k+len(pos_segments)]))
+        
+        if cfg.BENCHMARK:
+            benchmark_prediction_args.append((iou_ar, fn))       
+        
         k += len(pos_segments)
-      
-    #Visualize label errors
-    Path(cfg.ERROR_PROPOSAL_DIR).mkdir(parents=True, exist_ok=True)
+        
     with Pool(cfg.NUM_WORKERS) as p:
-        print("Visualize error proposals...")
-        p.starmap(proposal_vis, segment_heap)
+        if cfg.BENCHMARK:
+            Path(cfg.BENCHMARK_PROPOSAL_VIS_DIR).mkdir(parents=True, exist_ok=True)
+            Path(cfg.ERROR_DIR).mkdir(parents=True, exist_ok=True)
+            print("Creating benchmark proposals...")
+            p.starmap(benchmark_vis, benchmark_prediction_args)
+            print("Creating label error visualizations...")
+            p.map(label_error_vis, val_fns)
+        
+        #Visualize label errors
+        else:
+            Path(cfg.ERROR_PROPOSAL_DIR).mkdir(parents=True, exist_ok=True)
+            print("Visualize error proposals...")
+            p.starmap(proposal_vis, segment_heap)
     

@@ -2,15 +2,54 @@
 import os
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
+from scipy.ndimage import label
 
 from config import cfg
 
 import labels
 
 
+def benchmark_vis(iou_ar, fn):
+    pred_pgt_ar = np.zeros_like(iou_ar)
+    structure = np.ones((3, 3), dtype=int)
+    segment_ar = label(iou_ar, structure)[0]
+    for idx in np.unique(segment_ar):
+        if idx > 0:
+            segment = np.where(segment_ar == idx)
+            if len(segment[0]) >= cfg.MIN_ERROR_SIZE:
+                pred_pgt_ar[segment] = iou_ar[segment]
+
+    inf_mask_suffix = os.listdir(cfg.GT_MASKS_DIR)[0].split(".")[-1]
+    inf_ar = np.asarray(Image.open(os.path.join(cfg.INFERENCE_OUTPUT_DIR, fn + "." + inf_mask_suffix)), dtype="uint8")
+
+    result = np.zeros(pred_pgt_ar.shape + (3,), dtype='uint8')
+    result[:,:,0] = pred_pgt_ar
+    result[:,:,1] = inf_ar
+
+    Image.fromarray(result).save(os.path.join(cfg.BENCHMARK_PROPOSAL_VIS_DIR, fn + "_proposals.png"))
+    
+    
+def label_error_vis(fn):
+    diff_mask = np.load(os.path.join(cfg.DIFF_DIR, fn + "_diff_map.npy"))
+    img_suffix = os.listdir(cfg.GT_MASKS_DIR)[0].split(".")[-1]
+    gt_mask = np.array(Image.open(os.path.join(cfg.GT_MASKS_DIR, fn + "." + img_suffix)))
+
+    structure = np.ones((3, 3), dtype=int)
+    error_segments = label(diff_mask, structure)[0]
+    for idx in np.unique(error_segments):
+        if idx > 0:
+            segment = np.where(error_segments == idx)
+            if len(segment[0]) < cfg.MIN_ERROR_SIZE:
+                diff_mask[segment] = 0
+
+    diff_mask[diff_mask==1] = gt_mask[diff_mask==1]
+    Image.fromarray(diff_mask).save(os.path.join(cfg.ERROR_DIR, fn + "_label_errors." + img_suffix))
+
+
 def proposal_vis(iou, fn, seg_id, cls_id):
     """Visualization of one potential label error in image fn"""
-    inf_ar = np.asarray(Image.open(os.path.join(cfg.INFERENCE_OUTPUT_DIR, fn + ".png")), dtype="uint8")
+    inf_mask_suffix = os.listdir(cfg.GT_MASKS_DIR)[0].split(".")[-1]
+    inf_ar = np.asarray(Image.open(os.path.join(cfg.INFERENCE_OUTPUT_DIR, fn + "." + inf_mask_suffix)), dtype="uint8")
     
     gt_mask_suffix = os.listdir(cfg.GT_MASKS_DIR)[0].split(".")[-1]
     net_input_suffix = os.listdir(cfg.NET_INPUT_DIR)[0].split(".")[-1]

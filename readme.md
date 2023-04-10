@@ -9,17 +9,17 @@ quantification to find label errors in semantic segmentation datasets.
 * First, clone the repo into your home directory:
 
     ```
-    > git clone https://github.com/mrcoee/Automatic-Label-Error-Detection.git
+    git clone https://github.com/mrcoee/Automatic-Label-Error-Detection.git
     ```
 * Next, navigate into "~/labelerror_detection/src" and run
     
     ```
-    > pip install -r requirements.txt
+    pip install -r requirements.txt
     ```
 * And lastly also run
     
     ```
-    > ./x.sh
+    ./x.sh
     ```
 
 
@@ -55,27 +55,35 @@ pixel containing a class id. The logit outputs must be saved as npy arrays in [C
 The path to each folder and the dataset to evaluate are set in the config. Currently implemented datasets are Cityscapes, Carla, PascalVOC
 and Cocostuff. If you wish to add additional datasets, you have to provide the class definition in the *label.py* file.
 
-
 ## Run the code
 To load the data and calculate the metrics, run
 
 ```
-> python3 main.py --load
+python3 main.py --load
 ```
 in *.../labelerror_detection/src/*. The calculated metrics are saved in the *METRICS_DIR* defined in the config. To apply the meta seg
 model on these metrics and to find label errors, run
 ```
-> python3 main.py --evaluate
+python3 main.py --evaluate
 ```
 afterwards. The visualizations of the error proposals are saved in the *VISUALIZATIONS_DIR* folder.
 
+**Benchmarking:** To benchmark this model on a given dataset, in the above data folder create an additional folder that contains the perturbed segmentation masks. Specifiy the path to the perturbed data with the *PERTURBED_MASKS_DIR* option in the config file and set the *BENCHMARK* variable to True. Then run the code.
+
+It is necessary to recompute the metrics after changing the *BENCHMARK* value as the target masks for the metric computations changes. In benchmark mode, this model will produce two outputs images for each element of the dataset. First, it produces a binary mask that marks the label errors of a perturbed segmentation mask and saves it in the *DIFF_DIR* folder. Second, it creates an RGB image that encodes the uncertainties in the R channel by int(255 * p), where p is
+the uncertainty for a given pixel, and the segmentation mask in the G channel.
+
+To evaluate the results, simply run 
+```
+python3 auc.py
+```
+This will run an IoU computation for different uncertainty thresholds on the outputs from the model and the save the auc results in a log file in main folder of this repository. This scripts grabs all needed paths and variables from the config file. So don't change it in between these two steps.
 
 
 
 
 
-
-**Hints**
+# Hints
 * One part of the data you give the model is used for training and the other one for evaluation, i.e., to find label errors. You can set the 
 *SPLIT_RATIO* parameter in the config file to control the amount of data used in training and evaluaton. This split is done randomly, if you want
 to turn off this randomness, remove the following line from the evlaluate function in *analyze.py*

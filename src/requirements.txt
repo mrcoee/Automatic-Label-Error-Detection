@@ -1,7 +1,8 @@
-easydict
-numpy
-scipy
-Pillow
-tqdm
 Cython
+easydict
+numba
+numpy
+Pillow
 scikit-learn
+scipy
+tqdm
