@@ -96,4 +96,4 @@ to turn off this randomness, remove the following line from the evlaluate functi
 
 * When calculating the metrics, for each component in a predicted mask we calculate the number of inner pixels divided by the number of boundary pixels. 
 If a segmentation mask does not contain a single component, there are no boundary pixels and we divide by zero. Therefore it is necessary to
-to remove all these predictions before feeding the data to the model.
+remove all these predictions before feeding the data to the model.
